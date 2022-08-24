@@ -3,11 +3,13 @@ import pygame
 import sys
 import random
 import os
+import time
 
 # SNAKE GAME MADE WITH PYGAME
 
 pygame.init()
 font = pygame.font.SysFont("arial", 25)
+pygame.display.set_caption("Snake Game")
 
 screen_width = 600
 screen_height = 600
@@ -117,12 +119,16 @@ class SNAKE:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_w:
                     self.turn(up)
+                    time.sleep(0.02)
                 elif event.key == pygame.K_a:
                     self.turn(left)
+                    time.sleep(0.02)
                 elif event.key == pygame.K_s:
                     self.turn(down)
+                    time.sleep(0.02)
                 elif event.key == pygame.K_d:
                     self.turn(right)
+                    time.sleep(0.02)
 
     def turn(self, direction):
         # Prevent snake turning into itself
