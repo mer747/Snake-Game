@@ -38,8 +38,13 @@ eating = pygame.mixer.Sound(os.path.join("Sounds", "eating.ogg"))
 hits = pygame.mixer.Sound(os.path.join("Sounds", "hit-wall.wav"))
 hits2 = pygame.mixer.Sound(os.path.join("Sounds", "hit-wall2.wav"))  # Not Used
 
+# Fonts
 scoreFont = pygame.font.Font("./Fonts/Tigerious.otf", 72)
-hungerFont = pygame.font.Font("./Fonts/Tigerious.otf", 36)
+
+# Images
+hungerBarRaw = pygame.image.load("./Assets/hunger-bar.png")
+hungerBar = pygame.transform.scale(
+    hungerBarRaw, (300, 300))  # Making image bigger
 
 
 def DrawGrid(surface):
@@ -77,9 +82,11 @@ class SNAKE:
     def __init__(self):
         self.positions = [((screen_width/2, screen_height/2))]
         self.length = 1
-        self.hunger = 75
+        self.hunger = 120
+        self.starting_hunger = 120
         self.direction = random.choice([up, down, right, left])
         self.color = snake_color
+        self.eaten = 0
         self.score = 0  # Score
 
     def draw(self, surface):
@@ -98,7 +105,7 @@ class SNAKE:
             self.positions.insert(0, new)
             if len(self.positions) > self.length:
                 self.positions.pop()  # Prevent snake from getting bigger than its supposed to
-                self.hunger -= 1
+                self.hunger -= 1.2  # Hunger decrease while running
 
                 if self.hunger <= 0:
                     score.reset()
@@ -112,8 +119,9 @@ class SNAKE:
 
     def reset(self):
         # Reset snake
+        self.eaten = 0
         self.positions = [((screen_width/2), (screen_height/2))]
-        self.hunger = 75
+        self.hunger = self.starting_hunger
         self.length = 1
         self.direction = random.choice([up, down, right, left])
         self.score = 0
@@ -158,9 +166,8 @@ class SCORE:
         surface.blit(text, self.position)
 
         if snake.positions[0] == food.position:  # When the food is eaten
-            snake.hunger += 40
-            if snake.hunger > 100:
-                snake.hunger = 100
+            snake.hunger += 60
+            snake.eaten += 1
             self.score += 1
             snake.length += 1
             snake.score += 1
@@ -173,17 +180,22 @@ class SCORE:
 
 class HUNGER:
     def __init__(self):
-        self.font = hungerFont
         self.color = (0, 0, 0)
-        self.position = (350, 30)
+        self.position = (350, -95)  # Interesting coordinates
+        self.bar_pos = [430, 46]  # x, y
+        self.bar_height = 20
+        self.bar_length = 120
+        self.max_hunger = 140
 
     def draw(self, surface, snake):
-        if snake.hunger % 5 == 0:
-            hunger = snake.hunger
-        else:
-            hunger = snake.hunger - snake.hunger % 5
-        text = self.font.render(f"Hunger: %{hunger}", True, self.color)
-        surface.blit(text, self.position)
+        surface.blit(hungerBar, self.position)
+
+        if snake.hunger > self.max_hunger:
+            snake.hunger = self.max_hunger  # Prevent hunger from passing the limit
+
+        bar = pygame.Rect(
+            self.bar_pos[0], self.bar_pos[1], snake.hunger, self.bar_height)
+        pygame.draw.rect(surface, self.color, bar)
 
 
 def main():
