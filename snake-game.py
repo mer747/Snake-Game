@@ -25,9 +25,9 @@ food_color = (233, 133, 0)
 darkgreen = (80, 167, 89)
 lightgreen = (88, 204, 118)
 cyan = (98, 143, 142)
-snake_color = 88, 27, 118
+snake_color = (88, 27, 118)
 
-# Coordinat changes per second
+# Coordinat changes per move
 up = (0, -1)
 down = (0, 1)
 right = (1, 0)
@@ -41,7 +41,7 @@ hits2 = pygame.mixer.Sound(os.path.join("Sounds", "hit-wall2.wav"))  # Not Used
 # Fonts
 scoreFont = pygame.font.Font("./Fonts/Tigerious.otf", 72)
 
-# Images
+# Assets
 hungerBarRaw = pygame.image.load("./Assets/hunger-bar.png")
 hungerBar = pygame.transform.scale(
     hungerBarRaw, (300, 300))  # Making image bigger
@@ -86,8 +86,6 @@ class SNAKE:
         self.starting_hunger = 120
         self.direction = random.choice([up, down, right, left])
         self.color = snake_color
-        self.eaten = 0
-        self.score = 0  # Score
 
     def draw(self, surface):
         # Placement
@@ -119,7 +117,6 @@ class SNAKE:
 
     def reset(self):
         # Reset snake
-        self.eaten = 0
         self.positions = [((screen_width/2), (screen_height/2))]
         self.hunger = self.starting_hunger
         self.length = 1
@@ -156,7 +153,7 @@ class SNAKE:
 
 class SCORE:
     def __init__(self):
-        self.score = 0
+        self.score = 0  # Score
         self.font = scoreFont
         self.color = (0, 0, 0)
         self.position = (30, 30)
@@ -167,10 +164,8 @@ class SCORE:
 
         if snake.positions[0] == food.position:  # When the food is eaten
             snake.hunger += 60
-            snake.eaten += 1
             self.score += 1
             snake.length += 1
-            snake.score += 1
             pygame.mixer.Sound.play(eating)  # Eating food sound
             food.randomPos()
 
@@ -184,17 +179,16 @@ class HUNGER:
         self.position = (350, -95)  # Interesting coordinates
         self.bar_pos = [430, 46]  # x, y
         self.bar_height = 20
-        self.bar_length = 120
         self.max_hunger = 140
 
     def draw(self, surface, snake):
         surface.blit(hungerBar, self.position)
 
-        if snake.hunger > self.max_hunger:
-            snake.hunger = self.max_hunger  # Prevent hunger from passing the limit
+        if snake.hunger >= self.max_hunger:
+            snake.hunger = self.max_hunger  # Prevent hunger from going over the limit
 
         bar = pygame.Rect(
-            self.bar_pos[0], self.bar_pos[1], snake.hunger, self.bar_height)
+            self.bar_pos[0], self.bar_pos[1], snake.hunger, self.bar_height)  # x, y, length, height
         pygame.draw.rect(surface, self.color, bar)
 
 
