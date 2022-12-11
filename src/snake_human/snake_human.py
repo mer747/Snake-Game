@@ -5,7 +5,7 @@ import random
 import os
 import time
 
-# SNAKE GAME MADE WITH PYGAME
+# SNAKE GAME MADE WITH PYGAME (ORIGINAL)
 
 pygame.init()
 font = pygame.font.SysFont("arial", 25)
