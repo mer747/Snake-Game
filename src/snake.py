@@ -48,6 +48,7 @@ hungerBarRaw = pygame.image.load("./Assets/hunger-bar.png")
 hungerBar = pygame.transform.scale(
     hungerBarRaw, (300, 300))  # Making image bigger
 
+deathTrigger = False # For giving penalty for dying
 
 def DrawGrid(surface):
     # The game field
@@ -102,22 +103,27 @@ class SNAKE:
             pygame.draw.rect(surface, self.color, rect)
 
     def move(self, score):
+        global deathTrigger
+
         current = self.positions[0]
         x, y = self.direction
         new = ((current[0] + (x * gridsize)), (current[1] + (y * gridsize)))
         # x * gridsize, y * gridsize
 
         if new[0] in range(0, screen_width) and new[1] in range(0, screen_height) and not (new in self.positions[2:]):
+            deathTrigger = False
             self.positions.insert(0, new)
             if len(self.positions) > self.length:
                 self.positions.pop()  # Prevent snake from getting bigger than its supposed to
                 self.hunger -= 1  # Hunger decrease while running
 
                 if self.hunger <= 0:
+                    deathTrigger = True
                     self.reset()
                     pygame.mixer.Sound.play(hits)
 
         else:
+            deathTrigger = True
             self.reset()
             pygame.mixer.Sound.play(hits)
 
@@ -139,6 +145,17 @@ class SNAKE:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            '''    
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w:
+                    self.turn(up)
+                elif event.key == pygame.K_a:
+                    self.turn(left)
+                elif event.key == pygame.K_s:
+                    self.turn(down)
+                elif event.key == pygame.K_d:
+                    self.turn(right)
+            '''
             
 
     def turn(self, direction):
@@ -164,7 +181,7 @@ class SCORE:
             snake.hunger += 60
             self.score += 1
             snake.length += 1
-            pygame.mixer.Sound.play(eating)  # Eating food sound
+            # pygame.mixer.Sound.play(eating)  # Eating food sound
             food.randomPos()
 
     def reset(self):
@@ -270,14 +287,12 @@ def data(): # Storing all needed data in a dictionary
     
     
     def reward():
+        global deathTrigger
+
         reward = 0
         distances = distance(snake.positions[0][0], food.position[0], snake.positions[0][1], food.position[1])
 
-        current = snake.positions[0]
-        x, y = snake.direction
-        new = ((current[0] + (x * gridsize)), (current[1] + (y * gridsize)))
-
-        if not (new[0] in range(0, screen_width) and new[1] in range(0, screen_height) and not (new in snake.positions[2:])):
+        if deathTrigger == True:
             reward -= 10
         if distances <= 20:
             reward += 0.75
@@ -302,6 +317,6 @@ def data(): # Storing all needed data in a dictionary
 
 if __name__ == "__main__": # For testing
     while True:
-        main(15)
+        main(5)
         print(data())
         
