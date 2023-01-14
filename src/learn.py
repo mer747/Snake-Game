@@ -17,7 +17,7 @@ env.reset()
 
 model = PPO('MlpPolicy', env, verbose=1, tensorboard_log=logdir)
 
-# model_path = "./models/example_model/400000.zip"
+# model_path = "./models/example_model/trained_model.zip"
 # model = PPO.load(model_path, env=env)
 # For loading example model
 

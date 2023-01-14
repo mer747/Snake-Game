@@ -145,7 +145,7 @@ class SNAKE:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            '''    
+                
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_w:
                     self.turn(up)
@@ -155,7 +155,7 @@ class SNAKE:
                     self.turn(down)
                 elif event.key == pygame.K_d:
                     self.turn(right)
-            '''
+            
             
 
     def turn(self, direction):
@@ -237,18 +237,24 @@ def main(clocks): # Game Function
 
 def data(): # Storing all needed data in a dictionary
     def direction():
-        if snake.direction == (0, -1):
-            direction = "up"
-        elif snake.direction == (0, 1):
-            direction = "down"
-        elif snake.direction == (1, 0):
-            direction = "right"
-        elif snake.direction == (-1, 0):
-            direction = "left"
+        global direction
+
+        direction = [0, 0, 0, 0] # left, up, right, down
+
+        if snake.direction == (0, -1): # Up
+            direction[1] = 1
+        elif snake.direction == (0, 1): # Down
+            direction[3] = 1
+        elif snake.direction == (1, 0): # Right
+            direction[2] = 1
+        elif snake.direction == (-1, 0): # Left
+            direction[0] = 1
 
         return direction
 
     def foodpos(): # Food position based on directions
+        global foodpos
+
         foodpos = [0, 0, 0, 0] # left, up, right, down
 
         if snake.positions[0][0] > food.position[0]:
@@ -273,7 +279,7 @@ def data(): # Storing all needed data in a dictionary
         if (snake_y + gridsize) == screen_height:
             dangers[3] = 1
         if snake_y == 0:
-            dangers[2] = 1
+            dangers[1] = 1
         if(snake_x + gridsize, snake_y) in snake.positions[2:] and direction() != "left": # Body on right
             dangers[2] = 1
         if(snake_x - gridsize, snake_y) in snake.positions[2:] and direction() != "right": # Body on left
@@ -287,7 +293,7 @@ def data(): # Storing all needed data in a dictionary
     
     
     def reward():
-        global deathTrigger
+        global deathTrigger, direction, foodpos
 
         reward = 0
         distances = distance(snake.positions[0][0], food.position[0], snake.positions[0][1], food.position[1])
@@ -301,6 +307,9 @@ def data(): # Storing all needed data in a dictionary
         if distances <= 75:
             reward += 0.25
 
+        if ((direction[0] == 1) and (direction[0] == foodpos[0])) or ((direction[1] == 1) and (direction[1] == foodpos[1])) or ((direction[2] == 1) and (direction[2] == foodpos[2])) or ((direction[3] == 1) and (direction[3] == foodpos[3])):
+            reward += 0.1 # Checking if snake is heading towards food
+        
         return reward + score.score
 
     data = {
